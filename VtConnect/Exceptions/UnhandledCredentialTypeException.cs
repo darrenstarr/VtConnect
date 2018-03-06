@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace VtConnect.Exceptions
+﻿namespace VtConnect.Exceptions
 {
+    using System;
+
     public class UnhandledCredentialTypeException : VtConnectException
     {
         public UnhandledCredentialTypeException(string message) :

@@ -1,9 +1,8 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace VtConnect
+﻿namespace VtConnect
 {
+    using System;
+    using System.Threading.Tasks;
+
     public abstract class Connection
     {
         public Uri Destination { get; set; }
@@ -16,11 +15,7 @@ namespace VtConnect
             get;
         }
 
-        public Func<object, DataReceivedEventArgs, Task> DataReceived;
-
-        public Connection()
-        {
-        }
+        public EventHandler<DataReceivedEventArgs> DataReceived;
 
         public abstract Task<bool> Connect(Uri destination, NetworkCredentials credentials);
 

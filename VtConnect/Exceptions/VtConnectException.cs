@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace VtConnect.Exceptions
+﻿namespace VtConnect.Exceptions
 {
+    using System;
+
     public class VtConnectException : Exception
     {
         public VtConnectException(string message) :

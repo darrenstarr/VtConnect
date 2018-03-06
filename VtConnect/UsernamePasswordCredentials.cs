@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace VtConnect
+﻿namespace VtConnect
 {
     public class UsernamePasswordCredentials : NetworkCredentials
     {

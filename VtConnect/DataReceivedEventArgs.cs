@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace VtConnect
+﻿namespace VtConnect
 {
+    using System;
+
     public class DataReceivedEventArgs : EventArgs, IEquatable<DataReceivedEventArgs>
     {
         public byte [] Data { get; internal set; }

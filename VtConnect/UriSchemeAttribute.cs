@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace VtConnect
+﻿namespace VtConnect
 {
+    using System;
+
     internal class UriSchemeAttribute : Attribute
     {
         public string Name { get; private set; }

@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace VtConnect
+﻿namespace VtConnect
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
     internal class ConnectionFactory
     {
         private static Dictionary<string, Type> _SchemeTypes;

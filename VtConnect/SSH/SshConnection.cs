@@ -1,11 +1,11 @@
-﻿using Renci.SshNet;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using VtConnect.Exceptions;
-
-namespace VtConnect
+﻿namespace VtConnect.SSH
 {
+    using Renci.SshNet;
+    using System;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using VtConnect.Exceptions;
+
     [UriScheme("ssh")]
     public class SshConnection : Connection, IDisposable, IEquatable<SshConnection>
     {
@@ -77,6 +77,7 @@ namespace VtConnect
         public override async Task SendData(byte[] data)
         {
             await Task.Factory.FromAsync(ClientStream.BeginWrite, ClientStream.EndWrite, data, 0, data.Length, null);
+            await ClientStream.FlushAsync();
         }
 
         private void ClientStream_ErrorOccurred(object sender, Renci.SshNet.Common.ExceptionEventArgs e)
@@ -114,25 +115,11 @@ namespace VtConnect
 
         private void ClientStream_DataReceived(object sender, Renci.SshNet.Common.ShellDataEventArgs e)
         {
-            Task.Run(async () =>
+            DataReceived.Invoke(
+                this,
+                new DataReceivedEventArgs
                 {
-                    Delegate[] invocationList = DataReceived.GetInvocationList();
-                    Task[] dataReceivedTasks = new Task[invocationList.Length];
-
-                    for (int i = 0; i < invocationList.Length; i++)
-                    {
-                        dataReceivedTasks[i] =
-                            ((Func<object, DataReceivedEventArgs, Task>)invocationList[i])
-                                (
-                                    this,
-                                    new DataReceivedEventArgs
-                                    {
-                                        Data = e.Data.ToArray()
-                                    }
-                                );
-                    }
-
-                    await Task.WhenAll(dataReceivedTasks);
+                    Data = e.Data.ToArray()
                 }
             );
         }
@@ -180,7 +167,12 @@ namespace VtConnect
 
         public override void SetTerminalWindowSize(int columns, int rows, int width, int height)
         {
-            ClientStream.SendWindowChangeRequest((uint)columns, (uint)rows, (uint)width, (uint)height);
+            Columns = columns;
+            Rows = rows;
+
+            if(IsConnected)
+                ClientStream.SendWindowChangeRequest((uint)columns, (uint)rows, (uint)width, (uint)height);
+
         }
     }
 }
