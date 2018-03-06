@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\modules\SSH.NET\src\Renci.SshNet.NETCore\Renci.SshNet.NETCore.csproj" />
+    <ProjectReference Include="..\..\SSH.NET\src\Renci.SshNet.NETCore\Renci.SshNet.NETCore.csproj" />
   </ItemGroup>
 
 </Project>
