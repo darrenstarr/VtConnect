@@ -11,11 +11,11 @@ namespace VtConnect.Tests
         {
             var telnetConnection = Connection.CreateConnection(new Uri("telnet://localhost"));
             Assert.NotNull(telnetConnection);
-            Assert.IsType<TelnetConnection>(telnetConnection);
+            Assert.IsType<Telnet.TelnetConnection>(telnetConnection);
 
             var sshConnection = Connection.CreateConnection(new Uri("ssh://localhost"));
             Assert.NotNull(sshConnection);
-            Assert.IsType<SshConnection>(sshConnection);
+            Assert.IsType<SSH.SshConnection>(sshConnection);
 
             var badConnection = Connection.CreateConnection(new Uri("bad://localhost"));
             Assert.Null(badConnection);
