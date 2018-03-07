@@ -1,6 +1,7 @@
 ﻿namespace VtConnect.Telnet
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Net.Sockets;
     using System.Text;
@@ -14,10 +15,12 @@
             get { return Client != null && Stream != null && Client.Connected;  }
         }
 
-        public TcpClient Client { get; set; }
-        public NetworkStream Stream { get; set; }
+        private TcpClient Client { get; set; }
+        private NetworkStream Stream { get; set; }
         private byte [] CarryOver { get; set; }
         private byte [] ReceiveBuffer { get; set; }
+
+        private Dictionary<int, bool> ServerWill { get; set; } = new Dictionary<int, bool>();
 
         public override async Task<bool> Connect(Uri destination, NetworkCredentials credentials)
         {
@@ -88,16 +91,25 @@
                 if (data[index] == (byte)ETelnetCommand.IAC)
                 {
                     if(startOfRun != index)
-                        DataReceived.Invoke(this, new DataReceivedEventArgs { Data = data.Skip(startOfRun).Take(index - startOfRun).ToArray() });
+                        DataReceived.Invoke(
+                            this,
+                            new DataReceivedEventArgs
+                            {
+                                Data = data
+                                    .Skip(startOfRun)
+                                    .Take(index - startOfRun)
+                                    .ToArray()
+                            }
+                        );
 
                     if ((index + 1) < data.Length)
                     {
-                        switch (data[index + 1])
+                        switch ((ETelnetCommand)(data[index + 1]))
                         {
-                            case (byte)ETelnetCommand.Do:      // TELNET Do
-                            case (byte)ETelnetCommand.Dont:    // TELNET Don't
-                            case (byte)ETelnetCommand.Will:    // TELNET Will
-                            case (byte)ETelnetCommand.Wont:    // TELNET Won't
+                            case ETelnetCommand.Do:      // TELNET Do
+                            case ETelnetCommand.Dont:    // TELNET Don't
+                            case ETelnetCommand.Will:    // TELNET Will
+                            case ETelnetCommand.Wont:    // TELNET Won't
                                 if ((index + 2) < data.Length)
                                 {
                                     switch(data[index + 1])
@@ -130,7 +142,7 @@
                                 }
                                 break;
 
-                            case (byte)ETelnetCommand.SB:
+                            case ETelnetCommand.SB:
                                 var subcommandRunsTo = index + 2;
                                 while((subcommandRunsTo + 1) < data.Length)
                                 {
@@ -162,7 +174,7 @@
 
                                 break;
 
-                            case (byte)ETelnetCommand.IAC:
+                            case ETelnetCommand.IAC:
                                 DataReceived.Invoke(this, new DataReceivedEventArgs { Data = new byte [] { 0xFF } });
                                 index += 2;
                                 startOfRun = index;
@@ -370,11 +382,15 @@
         private void TelnetWill(int code)
         {
             System.Diagnostics.Debug.WriteLine("Telnet will : " + code.ToString());
+
+            ServerWill[code] = true;
         }
 
         private void TelnetWont(int code)
         {
             System.Diagnostics.Debug.WriteLine("Telnet wont : " + code.ToString());
+
+            ServerWill[code] = false;
         }
     }
 }
