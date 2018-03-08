@@ -1,6 +1,7 @@
 ﻿namespace VtConnect.SSH
 {
     using Renci.SshNet;
+    using Renci.SshNet.Common;
     using System;
     using System.Linq;
     using System.Threading.Tasks;
@@ -55,6 +56,7 @@
 
                         ClientStream.DataReceived += ClientStream_DataReceived;
                         ClientStream.ErrorOccurred += ClientStream_ErrorOccurred;
+                        Client.ErrorOccurred += ClientErrorOccurred;
                     }
                     catch (Exception e)
                     {
@@ -72,6 +74,12 @@
                     return true;
                 }
             );
+        }
+
+        private void ClientErrorOccurred(object sender, ExceptionEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine(e.Exception.Message);
+            throw new NotImplementedException();
         }
 
         public override async Task SendData(byte[] data)

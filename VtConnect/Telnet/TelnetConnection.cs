@@ -12,13 +12,14 @@
     {
         public override bool IsConnected
         {
-            get { return Client != null && Stream != null && Client.Connected;  }
+            get { return !Disconnecting && Client != null && Stream != null && Client.Connected;  }
         }
 
         private TcpClient Client { get; set; }
         private NetworkStream Stream { get; set; }
         private byte [] CarryOver { get; set; }
         private byte [] ReceiveBuffer { get; set; }
+        private bool Disconnecting { get; set; }
 
         private Dictionary<int, bool> ServerWill { get; set; } = new Dictionary<int, bool>();
 
@@ -71,6 +72,8 @@
 
         public override void Disconnect()
         {
+            Disconnecting = true;
+
             Stream.Close();
             Stream = null;
 
@@ -80,6 +83,9 @@
 
         private void OnDataReceived(IAsyncResult ar)
         {
+            if (!IsConnected)
+                return;
+
             var bytesRead = Stream.EndRead(ar);
             var data = CarryOver == null ? ReceiveBuffer.Take(bytesRead).ToArray() : CarryOver.Concat(ReceiveBuffer.Take(bytesRead)).ToArray();
             CarryOver = null;
