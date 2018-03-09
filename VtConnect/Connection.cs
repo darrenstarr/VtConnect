@@ -17,7 +17,7 @@
 
         public EventHandler<DataReceivedEventArgs> DataReceived;
 
-        public abstract Task<bool> Connect(Uri destination, NetworkCredentials credentials);
+        public abstract bool Connect(Uri destination, NetworkCredentials credentials);
 
         public abstract void Disconnect();
 
@@ -28,7 +28,7 @@
             return result;
         }
 
-        public abstract Task SendData(byte[] data);
+        public abstract void SendData(byte[] data);
 
         public abstract void SetTerminalWindowSize(int columns, int rows, int width, int height);
     }

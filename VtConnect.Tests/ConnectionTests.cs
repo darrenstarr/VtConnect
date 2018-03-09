@@ -22,7 +22,7 @@ namespace VtConnect.Tests
         }
 
         [Fact]
-        public async Task ConnectSshUsernameAndPassword()
+        public void ConnectSshUsernameAndPassword()
         {
             var credentials = new UsernamePasswordCredentials
             {
@@ -34,7 +34,7 @@ namespace VtConnect.Tests
             var connection = Connection.CreateConnection(destination);
             Assert.NotNull(connection);
 
-            Assert.True(await connection.Connect(destination, credentials));
+            Assert.True(connection.Connect(destination, credentials));
         }
     }
 }

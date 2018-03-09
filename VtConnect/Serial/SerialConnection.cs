@@ -17,21 +17,18 @@
             get { return Stream != null && Stream.IsOpen; }
         }
 
-        public override Task<bool> Connect(Uri destination, NetworkCredentials credentials)
+        public override bool Connect(Uri destination, NetworkCredentials credentials)
         {
-            return Task.Run(() =>
-            {
-                var port = destination.Host;
+            var port = destination.Host;
 
-                var names = RJCP.IO.Ports.SerialPortStream.GetPortNames();
+            var names = RJCP.IO.Ports.SerialPortStream.GetPortNames();
 
-                Stream = new RJCP.IO.Ports.SerialPortStream(port, 9600);
-                Stream.Open();
+            Stream = new RJCP.IO.Ports.SerialPortStream(port, 9600);
+            Stream.Open();
 
-                Stream.BeginRead(ReceiveBuffer, 0, ReceiveBuffer.Length, OnDataReceived, null);
+            Stream.BeginRead(ReceiveBuffer, 0, ReceiveBuffer.Length, OnDataReceived, null);
 
-                return true;
-            });
+            return true;
         }
 
         private void OnDataReceived(IAsyncResult ar)
@@ -49,9 +46,9 @@
             Stream = null;
         }
 
-        public override Task SendData(byte[] data)
+        public override void SendData(byte[] data)
         {
-            return Stream.WriteAsync(data, 0, data.Length);
+            Stream.Write(data, 0, data.Length);
         }
 
         public override void SetTerminalWindowSize(int columns, int rows, int width, int height)

@@ -27,7 +27,7 @@
         /// <exception cref="SshConnectionException">SSH session could not be established.</exception>
         /// <exception cref="SshAuthenticationException">Authentication of SSH session failed.</exception>
         /// <exception cref="ProxyException">Failed to establish proxy connection.</exception>
-        public override Task<bool> Connect(Uri destination, NetworkCredentials credentials)
+        public override bool Connect(Uri destination, NetworkCredentials credentials)
         {
             Destination = destination;
 
@@ -44,36 +44,32 @@
             ConnectionInfo = new ConnectionInfo(destination.Host, port, credentials.Username, AuthenticationMethod);
             Client = new SshClient(ConnectionInfo);
 
-            return Task.Run(() =>
-                {
-                    try
-                    {
-                        Client.Connect();
+            try
+            {
+                Client.Connect();
 
-                        ClientStream = Client.CreateShellStream("xterm", (uint)Columns, (uint)Rows, 800, 600, 16384);
-                        if (ClientStream == null)
-                            throw new VtConnectException("Failed to create client stream");
+                ClientStream = Client.CreateShellStream("xterm", (uint)Columns, (uint)Rows, 800, 600, 16384);
+                if (ClientStream == null)
+                    throw new VtConnectException("Failed to create client stream");
 
-                        ClientStream.DataReceived += ClientStream_DataReceived;
-                        ClientStream.ErrorOccurred += ClientStream_ErrorOccurred;
-                        Client.ErrorOccurred += ClientErrorOccurred;
-                    }
-                    catch (Exception e)
-                    {
-                        Client.Disconnect();
-                        Client.Dispose();
-                        Client = null;
+                ClientStream.DataReceived += ClientStream_DataReceived;
+                ClientStream.ErrorOccurred += ClientStream_ErrorOccurred;
+                Client.ErrorOccurred += ClientErrorOccurred;
+            }
+            catch (Exception e)
+            {
+                Client.Disconnect();
+                Client.Dispose();
+                Client = null;
 
-                        ConnectionInfo = null;
-                        AuthenticationMethod = null;
+                ConnectionInfo = null;
+                AuthenticationMethod = null;
 
-                        System.Diagnostics.Debug.WriteLine(e.Message);
-                        return false;
-                    }
+                System.Diagnostics.Debug.WriteLine(e.Message);
+                return false;
+            }
 
-                    return true;
-                }
-            );
+            return true;
         }
 
         private void ClientErrorOccurred(object sender, ExceptionEventArgs e)
@@ -82,10 +78,10 @@
             throw new NotImplementedException();
         }
 
-        public override async Task SendData(byte[] data)
+        public override void SendData(byte[] data)
         {
-            await Task.Factory.FromAsync(ClientStream.BeginWrite, ClientStream.EndWrite, data, 0, data.Length, null);
-            await ClientStream.FlushAsync();
+            ClientStream.Write(data, 0, data.Length);
+            ClientStream.Flush();
         }
 
         private void ClientStream_ErrorOccurred(object sender, Renci.SshNet.Common.ExceptionEventArgs e)

@@ -47,10 +47,20 @@
 
         public static Connection CreateByScheme(string scheme)
         {
-            if (!SchemeTypes.TryGetValue(scheme, out Type typeForScheme))
-                return null;
+            // Release version doesn't like the nice way. Will need to ask someone
+            //if (!SchemeTypes.TryGetValue(scheme, out Type typeForScheme))
+            //    return null;
 
-            return (Connection)Activator.CreateInstance(typeForScheme);
+            //return (Connection)Activator.CreateInstance(typeForScheme);
+            switch(scheme.ToLower())
+            {
+                case "ssh":
+                    return new SSH.SshConnection();
+                case "telnet":
+                    return new Telnet.TelnetConnection();
+                default:
+                    return null;
+            }
         }
     }
 }

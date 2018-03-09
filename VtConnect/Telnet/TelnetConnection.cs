@@ -23,7 +23,7 @@
 
         private Dictionary<int, bool> ServerWill { get; set; } = new Dictionary<int, bool>();
 
-        public override async Task<bool> Connect(Uri destination, NetworkCredentials credentials)
+        public override bool Connect(Uri destination, NetworkCredentials credentials)
         {
             Destination = destination;
 
@@ -33,7 +33,7 @@
 
             try
             {
-                await Client.ConnectAsync(destination.Host, port);
+                Client.Connect(destination.Host, port);
 
                 Stream = Client.GetStream();
 
@@ -52,10 +52,10 @@
             return true;
         }
 
-        public override async Task SendData(byte[] data)
+        public override void SendData(byte[] data)
         {
-            await Stream.WriteAsync(data, 0, data.Length);
-            await Stream.FlushAsync();
+            Stream.Write(data, 0, data.Length);
+            Stream.Flush();
         }
 
         public override void SetTerminalWindowSize(int columns, int rows, int width, int height)
