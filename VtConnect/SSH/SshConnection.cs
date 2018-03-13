@@ -75,7 +75,33 @@
         private void ClientErrorOccurred(object sender, ExceptionEventArgs e)
         {
             System.Diagnostics.Debug.WriteLine(e.Exception.Message);
-            throw new NotImplementedException();
+
+            if(e.Exception is Renci.SshNet.Common.SshConnectionException)
+            {
+                try
+                {
+                    ClientStream.Close();
+                    ClientStream.Dispose();
+                }
+                finally
+                {
+                    ClientStream = null;
+                }
+
+                try
+                {
+                    Client.Disconnect();
+                    Client.Dispose();
+                }
+                finally
+                {
+                    ConnectionInfo = null;
+                    AuthenticationMethod = null;
+                    Client = null;
+                }
+            }
+            else
+                throw new NotImplementedException();
         }
 
         public override void SendData(byte[] data)
