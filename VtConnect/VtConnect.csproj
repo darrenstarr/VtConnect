@@ -3,7 +3,12 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\SerialPortStream\code\SerialPortStream-netstandard15.csproj" />
+    <Compile Remove="Serial\SerialConnection.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Serial\SerialConnection.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\SSH.NET\src\Renci.SshNet.NETCore\Renci.SshNet.NETCore.csproj" />
   </ItemGroup>
 </Project>
