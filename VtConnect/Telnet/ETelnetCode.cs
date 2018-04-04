@@ -2,6 +2,7 @@
 {
     public enum ETelnetCode
     {
+        BinaryTransmission = 0,     // RFC856
         Echo = 1,                   // RFC857
         SuppressGoAhead = 3,        // RFC858
         Status = 5,                 // RFC859

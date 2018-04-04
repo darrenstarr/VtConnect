@@ -223,6 +223,8 @@
             
             switch(data[0])
             {
+                case (byte)ETelnetCode.BinaryTransmission:
+                    throw new NotImplementedException();
                 case (byte)ETelnetCode.TerminalType:
                     SendTerminalType();
                     break;
