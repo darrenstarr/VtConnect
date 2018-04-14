@@ -1,9 +1,10 @@
 ﻿namespace VtConnect
 {
     using System;
+    using System.ComponentModel;
     using System.Threading.Tasks;
 
-    public abstract class Connection
+    public abstract class Connection : INotifyPropertyChanged
     {
         public Uri Destination { get; set; }
 
@@ -16,6 +17,8 @@
         }
 
         public EventHandler<DataReceivedEventArgs> DataReceived;
+
+        public abstract event PropertyChangedEventHandler PropertyChanged;
 
         public abstract bool Connect(Uri destination, NetworkCredentials credentials);
 

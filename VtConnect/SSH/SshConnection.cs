@@ -3,6 +3,7 @@
     using Renci.SshNet;
     using Renci.SshNet.Common;
     using System;
+    using System.ComponentModel;
     using System.Linq;
     using System.Threading.Tasks;
     using VtConnect.Exceptions;
@@ -22,6 +23,8 @@
                 return !DisposedValue && ClientStream != null && Client != null && Client.IsConnected;
             }
         }
+
+        public override event PropertyChangedEventHandler PropertyChanged;
 
         /// <exception cref="SocketException">Socket connection to the SSH server or proxy server could not be established, or an error occurred while resolving the hostname.</exception>
         /// <exception cref="SshConnectionException">SSH session could not be established.</exception>
@@ -55,6 +58,8 @@
                 ClientStream.DataReceived += ClientStream_DataReceived;
                 ClientStream.ErrorOccurred += ClientStream_ErrorOccurred;
                 Client.ErrorOccurred += ClientErrorOccurred;
+
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("IsConnected"));
             }
             catch (Exception e)
             {
@@ -98,6 +103,8 @@
                     ConnectionInfo = null;
                     AuthenticationMethod = null;
                     Client = null;
+
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("IsConnected"));
                 }
             }
             else
@@ -128,11 +135,16 @@
                 AuthenticationMethod = null;
                 ClientStream = null;
                 Client = null;
+
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("IsConnected"));
             }
         }
 
         public override void Disconnect()
         {
+            if (!IsConnected)
+                return;
+
             ConnectionInfo = null;
             AuthenticationMethod = null;
 
@@ -141,6 +153,8 @@
 
             Client.Disconnect();
             Client = null;
+
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("IsConnected"));
         }
 
         private void ClientStream_DataReceived(object sender, Renci.SshNet.Common.ShellDataEventArgs e)

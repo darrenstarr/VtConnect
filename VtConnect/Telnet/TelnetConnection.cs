@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Linq;
     using System.Net.Sockets;
     using System.Text;
@@ -23,6 +24,8 @@
 
         private Dictionary<int, bool> ServerWill { get; set; } = new Dictionary<int, bool>();
 
+        public override event PropertyChangedEventHandler PropertyChanged;
+
         public override bool Connect(Uri destination, NetworkCredentials credentials)
         {
             Destination = destination;
@@ -41,6 +44,8 @@
                 Stream.BeginRead(ReceiveBuffer, 0, ReceiveBuffer.Length, OnDataReceived, null);
 
                 SendInitialCapabilities();
+
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("IsConnected"));
             }
             catch
             {
@@ -74,17 +79,30 @@
         {
             Disconnecting = true;
 
-            Stream.Close();
-            Stream = null;
+            if (Stream != null)
+            {
+                Stream.Close();
+                Stream = null;
+            }
 
-            Client.Close();
-            Client = null;
+            if (Client != null)
+            {
+                Client.Close();
+                Client = null;
+            }
+
+            Disconnecting = false;
+
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("IsConnected"));
         }
 
         private void OnDataReceived(IAsyncResult ar)
         {
             if (!IsConnected)
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("IsConnected"));
                 return;
+            }
 
             var bytesRead = Stream.EndRead(ar);
             var data = CarryOver == null ? ReceiveBuffer.Take(bytesRead).ToArray() : CarryOver.Concat(ReceiveBuffer.Take(bytesRead)).ToArray();

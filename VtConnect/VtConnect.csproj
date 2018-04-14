@@ -18,6 +18,6 @@
     <None Include="Serial\SerialConnection.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="VtNetConnect.Renci.SshNet" Version="1.0.1" />
+    <ProjectReference Include="..\..\SSH.NET\src\Renci.SshNet.NETCore\Renci.SshNet.NETCore.csproj" />
   </ItemGroup>
 </Project>
