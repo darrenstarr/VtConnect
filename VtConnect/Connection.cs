@@ -18,6 +18,8 @@
 
         public EventHandler<DataReceivedEventArgs> DataReceived;
 
+        public EventHandler<SshFingerprintEventArgs> KeyReceived;
+
         public abstract event PropertyChangedEventHandler PropertyChanged;
 
         public abstract bool Connect(Uri destination, NetworkCredentials credentials);
